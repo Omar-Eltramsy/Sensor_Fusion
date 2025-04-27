@@ -20,8 +20,12 @@ def Calibration(imgpath):
     imgPoint=[]
 
     img=cv.imread(imgpath)
+    if img is None:
+        raise FileExistsError(f'Image not found at path:{imgpath}')
+    
     gray=cv.cvtColor(img,cv.COLOR_BGR2GRAY)
     cornerFound,corners=cv.findChessboardCorners(gray,(row,col),None)
+    
     # Make sure the chess board pattern was found in the image
     if cornerFound:
         # Refine the corner position

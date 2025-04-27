@@ -33,14 +33,21 @@ def main():
     # Load Calibration Data 
     camMatrix, distcoeff, rvec, tvec = load(calibration_file)
 
-    # Initialize Serial Connection 
-    ser = serial.Serial(serial_port, baud_rate) 
-
+    try:
+        # Initialize Serial Connection 
+        ser = serial.Serial(serial_port, baud_rate,timeout=1) 
+    except serial.SerialException as e:
+        print(f'failed to open serial port {serial_port}: {e}')
+        return[]
     # Detect objects and overlay their centers
     model = YOLO("yolov8n.pt")  
     
     # Initialize Camera 
     cap = cv.VideoCapture(camera_index)
+    
+    if not cap.isOpened():
+        print('Error opening camera.')
+        return
     
     while True:
         # Read distance and servo angle
@@ -57,8 +64,8 @@ def main():
             ret,frame=cap.read()
             if not ret:
                 print('Failed to capture frame.')
+                break
             frame_height, frame_width, _ = frame.shape
-            frame = cv.undistort(frame, camMatrix, distcoeff)
 
             if 0 <= u < frame_width and 0 <= v < frame_height:  # Ensure u and v are defined
                 cv.circle(frame,(int(u),int(v)),5,(255,0,255),-3)
