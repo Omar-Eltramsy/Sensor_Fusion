@@ -85,6 +85,4 @@ def main():
     cv.destroyAllWindows()
     ser.close()
 
-if __name__=='__main__':
-    main()
 
